@@ -32,6 +32,16 @@ public:
     int shortestPath(const T& src, const T& dest) const;
     //  ================================================
 
+    //  [Evan TODO] 5) count and display the direct flight connections for each airport
+    void countDirectFlights() const;
+    /*
+        Sample Output:
+        Airport Connections
+        ATL     12
+        ORD     11
+        MIA     11
+    */
+
     bool isConnected() const;
 
 
