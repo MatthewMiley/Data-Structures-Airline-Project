@@ -25,9 +25,6 @@ void WeightedGraph<T>::insertEdge(const T& v1, const T& v2, int weight, int pric
 
     if (!hasEdge(i1, i2)) {
         edges[i1].push_back(Edge(weight, cost, i2));
-        if (i1 != i2) {
-            edges[i2].push_back(Edge(weight, cost, i1));
-        }
     }
 }  
 
