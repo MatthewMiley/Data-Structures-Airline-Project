@@ -1,7 +1,18 @@
 #ifndef WEIGHTEDGRAPH_HPP
 #define WEIGHTEDGRAPH_HPP
 #include <vector>
+#include <string>
 
+//  Class Edge represents the one directional path between two nodes.
+//  It contains the destination, the distance, and the cost
+class Edge {
+    public:
+    std::string destination
+    int distance;
+    int cost;
+
+    Edge(int d, int c, std::string e) : distance(d), cost(c), destination(e) {}
+};
 
 template <typename T>
 class WeightedGraph {
