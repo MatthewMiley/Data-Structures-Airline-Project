@@ -164,3 +164,19 @@ int WeightedGraph<T>::shortestPath(const T& src, const T& dest) const {
 
     return -1; // No path exists
 }
+
+
+
+//  [Evan TODO] 5) count and display the direct flight connections for each airport
+template <typename T>
+void WeightedGraph<T>::countDirectFlights() const {
+
+    /*
+        Sample Output:
+        Airport Connections
+        ATL     12
+        ORD     11
+        MIA     11
+    */
+
+}
