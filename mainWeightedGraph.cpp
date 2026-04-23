@@ -96,6 +96,9 @@ int main(void) {
             flight_weights_distance_cost[i][1] // cost
         );
     }
+    
+    //Testing Code Below Here:
+    Airport_Graph.shortestPath("BNA", "ATL");
 
     return 0;
 }

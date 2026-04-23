@@ -7,14 +7,14 @@
 //  It contains the destination, the distance, and the cost
 class Edge {
     public:
-    std::string origin
+    std::string origin;
     int origin_idx;
     std::string destination;
     int destination_idx;
     int distance;
     int cost;
 
-    Edge(std::string o, int o_idx std::string d, int d_idx, int l, int c) : origin(o), origin_idx(o_idx), destination(d), destination_idx(d_idx), distance(l), cost(c) {}
+    Edge(std::string o, int o_idx, std::string d, int d_idx, int l, int c) : origin(o), origin_idx(o_idx), destination(d), destination_idx(d_idx), distance(l), cost(c) {}
 };
 
 template <typename T>
@@ -24,7 +24,7 @@ public:
     //  insertVertex will add the origin flights into the 'vertices' vector
     void insertVertex(const T& v);
     //  [update to include weights to the edge] insertEdge will add'v2'(destination) and the given 'distance' and 'cost' into the 'edges' vector
-    void insertEdge(const T& v1, const T& v2);
+    void insertEdge(const T& v1, const T& v2, int weight, int price);
     //  (remove / alter) no need to simply print. Special prints will likely be handled by each of the search functions
     void print() const;
 
