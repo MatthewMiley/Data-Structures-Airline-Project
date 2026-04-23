@@ -7,11 +7,14 @@
 //  It contains the destination, the distance, and the cost
 class Edge {
     public:
-    std::string destination
+    std::string origin
+    int origin_idx;
+    std::string destination;
+    int destination_idx;
     int distance;
     int cost;
 
-    Edge(int d, int c, std::string e) : distance(d), cost(c), destination(e) {}
+    Edge(std::string o, int o_idx std::string d, int d_idx, int l, int c) : origin(o), origin_idx(o_idx), destination(d), destination_idx(d_idx), distance(l), cost(c) {}
 };
 
 template <typename T>
@@ -29,7 +32,7 @@ public:
     //  Will not need the simple searches, will be replaced with the specialized searches
     void DFS() const;
     void BFS(int start = 0) const;
-    int shortestPath(const T& src, const T& dest) const;
+    void shortestPath(const T& src, const T& dest) const;
     //  ================================================
 
     //  [Evan TODO] 5) count and display the direct flight connections for each airport
@@ -46,9 +49,10 @@ public:
 
 
 private:
-    //  The main vector 'vertices' that contains the list of every origin airport
+    //  The main vector 'vertices' that contains the list of every unique airport
     std::vector<T> vertices; 
-    std::vector<std::vector<int>> edges; 
+    //  Vector edges which contains 
+    std::vector<std::vector<Edge>> edges; 
 
     //  Given a input vertex, it will return the index. Returns -1 if not found
     int getVertexIndex(const T& vs) const;

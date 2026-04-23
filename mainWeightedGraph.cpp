@@ -70,7 +70,7 @@ int main(void) {
 
         // collect unique airports for later insertion as graph nodes
         if (airport_set.insert(origin).second) {
-            airports.push_back(origin);
+            airports.push_back(origin); //"***" where each * is a letter?
         }
         if (airport_set.insert(dest).second)
             airports.push_back(dest);
