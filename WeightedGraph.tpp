@@ -10,13 +10,12 @@ void WeightedGraph<T>::insertVertex(const T& v) {
     }
 
     vertices.push_back(v);
-    std::vector<int> tmp; // TODO
+    std::vector<Edge> tmp; // TODO
     edges.push_back(tmp); //insert empty vector to the edges
 }
 
-// TODO
 template <typename T>
-void WeightedGraph<T>::insertEdge(const T& v1, const T& v2) {
+void WeightedGraph<T>::insertEdge(const T& v1, const T& v2, int weight, int price) {
     int i1 = getVertexIndex(v1);
     int i2 = getVertexIndex(v2);
     if (i1 == -1 || i2 == -1) {
@@ -25,12 +24,9 @@ void WeightedGraph<T>::insertEdge(const T& v1, const T& v2) {
     }
 
     if (!hasEdge(i1, i2)) {
-        edges[i1].push_back(i2);
-        if (i1 != i2) {
-            edges[i2].push_back(i1);
-        }
+        edges[i1].push_back(Edge(weight, cost, i2));
     }
-}   
+}  
 
 template <typename T>
 int WeightedGraph<T>::getVertexIndex(const T& ver) const {
@@ -167,4 +163,20 @@ int WeightedGraph<T>::shortestPath(const T& src, const T& dest) const {
     }
 
     return -1; // No path exists
+}
+
+
+
+//  [Evan TODO] 5) count and display the direct flight connections for each airport
+template <typename T>
+void WeightedGraph<T>::countDirectFlights() const {
+
+    /*
+        Sample Output:
+        Airport Connections
+        ATL     12
+        ORD     11
+        MIA     11
+    */
+
 }
