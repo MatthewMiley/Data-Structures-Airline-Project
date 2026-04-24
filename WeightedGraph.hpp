@@ -1,5 +1,8 @@
 #ifndef WEIGHTEDGRAPH_HPP
 #define WEIGHTEDGRAPH_HPP
+
+
+#include "HashMap.hpp"
 #include <vector>
 #include <string>
 

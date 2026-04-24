@@ -55,14 +55,22 @@ int WeightedGraph<T>::getVertexIndex(const T& ver) const {
 
 // template <typename T>
 // void WeightedGraph<T>::print() const {
-//     for (int i = 0; i < vertices.size(); i++) {
-//         std::cout << "{ " << vertices[i] << ": ";
-//         for(int j = 0; j < edges[i].size(); j++) {
-//             std::cout << vertices[edges[i][j]] << ' ';
-//         }
-//         std::cout << " }\n";
-//     }
-// }
+    //     for (int i = 0; i < vertices.size(); i++) {
+        //         std::cout << "{ " << vertices[i] << ": ";
+        //         for(int j = 0; j < edges[i].size(); j++) {
+            //             std::cout << vertices[edges[i][j]] << ' ';
+            //         }
+            //         std::cout << " }\n";
+            //     }
+            // }
+            
+            
+template <typename T>
+void WeightedGraph<T>::print() const {
+    for (int i = 0; i < vertices.size(); i++) {
+        std::cout << vertices[i] << std::endl;
+    }
+}
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -257,9 +265,45 @@ void WeightedGraph<T>::shortestPath(const T& src, const T& dest) const {
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-//  [Evan TODO] 5) count and display the direct flight connections for each airport
+//  [Evan Done?] 5) count and display the direct flight connections for each airport
+//  This works exactly as expected for the Testing sample set. will check again after csv data is functioning
 template <typename T>
 void WeightedGraph<T>::countDirectFlights() const {
+
+    // 'verticies' has a list of every unique airport vertex
+    //  using a hashmap I can count the amount of times each origin has an outgoing
+    //  flight as well as every time a flight has one incomming.
+
+    //  hash of key (string)==[ABE, ABQ, etc] and value (int) count of direct flights
+    HashMap<std::string, int> map(7);
+
+    //  initialize the hash with all of the unique airports
+    for (int i = 0; i < vertices.size(); i++) {
+        map.insert(vertices[i]);
+    }
+
+    //  loop through edges, and add for each flight both ways
+    for (int i = 0; i < edges.size(); i++) {
+        //  origin airport <here>
+
+        //  for each origin, increment self by quantity of edges
+        map.incrementValue(vertices[i], edges[i].size());
+
+        for (int j = 0; j < edges[i].size(); j++) {
+            //  each edge or incomming connection <here>
+
+            //  for each edge increment destination by 1
+            map.incrementValue(edges[i][j].destination);
+
+        }
+
+    }
+
+    //output
+    map.mapOutput();
+    
+    //  this is only so they look good with spaces after multiple display functions are called
+    //std::cout << std::endl;
 
     /*
         Sample Output:
