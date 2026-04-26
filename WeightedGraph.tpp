@@ -14,7 +14,7 @@ void WeightedGraph<T>::insertVertex(const T& v) {
 
     vertices.push_back(v);
     std::vector<Edge> tmp;
-    edges.push_back(tmp); //insert empty vector to the edges
+    edges.push_back(tmp);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -22,21 +22,18 @@ void WeightedGraph<T>::insertVertex(const T& v) {
 //Weight=distance
 template <typename T>
 void WeightedGraph<T>::insertEdge(const T& v1, const T& v2, int weight, int price) {
-    //i1 is index of source airport
     int i1 = getVertexIndex(v1);
-
-    //i2 is index of destination airport
     int i2 = getVertexIndex(v2);
+
     if (i1 == -1 || i2 == -1) {
         std::cout << "insertEdge: incorrect vertices\n";
         return;
     }
 
-    if (!hasEdge(i1, i2)) {
-        //create edge object with origin, origin index, destination, destination index, distance, and price.
+    if (!hasEdge(i1, i2))  {
         edges[i1].push_back(Edge(v1, i1, v2, i2, weight, price));
     }
-}  
+}
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -44,10 +41,9 @@ template <typename T>
 int WeightedGraph<T>::getVertexIndex(const T& ver) const {
     for(int i = 0; i < vertices.size(); i++) {
         if (vertices[i] == ver) {
-            return i;
+            return i;;
         }
     }
-
     return -1;
 }
 
@@ -167,7 +163,7 @@ bool WeightedGraph<T>::hasEdge(int i1, int i2) const {
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-// [Matthew TODO] Find shortest path by distance between origin airport and destination
+// [Matthew TODO][DONE] Find shortest path by distance between origin airport and destination
 // Must output path and total distance
 template <typename T>
 void WeightedGraph<T>::shortestPath(const T& src, const T& dest) const {
@@ -277,7 +273,7 @@ void WeightedGraph<T>::countDirectFlights() const {
     //  flight as well as every time a flight has one incomming.
 
     //  hash of key (string)==[ABE, ABQ, etc] and value (int) count of direct flights
-    HashMap<std::string, int> map(7);
+    HashMap<std::string, int> map(300);
 
     //  initialize the hash with all of the unique airports
     for (int i = 0; i < vertices.size(); i++) {
@@ -338,7 +334,7 @@ void WeightedGraph<T>::undirectedGraph() const {
     std::cout << "Evan will do this soon" << std::endl;
 }
 
-//  [Evan TODO] 8)  Minimum spanning forest with Kruskals
+//  [Matthew TODO] 8)  Minimum spanning forest with Kruskals
 template <typename T>
 void WeightedGraph<T>::minimumSpanningForest() const {
 
@@ -349,6 +345,81 @@ void WeightedGraph<T>::minimumSpanningForest() const {
         one minimum spanning tree for each connected component. 
     
     */
-    std::cout << "Evan will do this soon" << std::endl;
+
+    // Collect edges into "parallel" vectors
+    // We store the origin index, destination index, and the cost
+    std::vector<int> srcIndices;
+    std::vector<int> destIndices;
+    std::vector<int> edgeCosts;
+
+    //For all edges, for each edge add srcIndicies, destinationIndices, and edge cost to thier respective vectors.
+    for (int i = 0; i < edges.size(); i++) {
+        for (int j = 0; j < edges[i].size(); j++) {
+            srcIndices.push_back(i);
+            destIndices.push_back(edges[i][j].destination_idx);
+            edgeCosts.push_back(edges[i][j].cost); // Use cost as weight 
+        }
+    }
+
+    // Sort (Selection Sort) by cost
+    // This organizes the 'parallel' vectors from lowest cost to highest
+    for (int i = 0; i < edgeCosts.size(); i++) {
+        int minIdx = i;
+        for (int j = i + 1; j < edgeCosts.size(); j++) {
+            if (edgeCosts[j] < edgeCosts[minIdx]) {
+                minIdx = j;
+            }
+        }
+        // Swap cost, src, and dest to keep them synchronized
+        int tempCost = edgeCosts[i];
+        edgeCosts[i] = edgeCosts[minIdx];
+        edgeCosts[minIdx] = tempCost;
+
+        int tempSrc = srcIndices[i];
+        srcIndices[i] = srcIndices[minIdx];
+        srcIndices[minIdx] = tempSrc;
+
+        int tempDest = destIndices[i];
+        destIndices[i] = destIndices[minIdx];
+        destIndices[minIdx] = tempDest;
+    }
+
+    // Setup DSU parent array
+    std::vector<int> parent(vertices.size());
+    for (int i = 0; i < vertices.size(); i++) {
+        parent[i] = i;
+    }
+
+    int totalForestCost = 0;
+    std::cout << "Minimum Spanning Forest Edges:" << std::endl;
+
+    // Process Edges
+    for (int i = 0; i < edgeCosts.size(); i++) {
+        int u = srcIndices[i];
+        int v = destIndices[i];
+
+        // "Find" logic 
+        int rootU = u;
+        while (parent[rootU] != rootU) {
+            rootU = parent[rootU];
+        }
+        int rootV = v;
+        while (parent[rootV] != rootV) {
+            rootV = parent[rootV];
+        }
+
+        // If roots are different, there is no cycle
+        if (rootU != rootV) {
+            parent[rootU] = rootV; // Union
+            totalForestCost += edgeCosts[i];
+
+            // Output the edge included in the forest
+            std::cout << vertices[u] << " - " << vertices[v] 
+                      << " (Cost: " << edgeCosts[i] << ")" << std::endl;
+        }
+    }
+
+    // Output total cost
+    std::cout << "Total Cost of Forest: " << totalForestCost << std::endl;
 
 }

@@ -4,163 +4,138 @@
 #include <fstream>
 #include <set>
 #include <iostream>
+#include <stdexcept>
 
 int main(void) {
 
     /* IMPLEMENTATION OF THE ORIGINAL GRAPH */
 
-    WeightedGraph<std::string> TEST_Airport_Graph;
+    WeightedGraph<std::string> Airport_Graph;    
 
-    //  =================================================================================================================================
-    //  EVERYTHING BETWEEN THE TWO === LINES IS FOR TESTING PURPOSES ONLY DO NOT INCLUDE IN FINAL
+    // Open csv file
+    std::ifstream file("airports.csv");
 
-    // A vector of limited airports for quick testing as recommended by Igor
-    std::vector<std::string> TEST_airports = {"ABE","ABQ","ABY","ACT","ADS","ZYX"};
-    // create a node for every unique airport using the vector
-    std::cout << "Inserting Airports: ";
-    for (int i = 0; i < (int)TEST_airports.size(); i++ ) {
-        TEST_Airport_Graph.insertVertex(TEST_airports[i]);
+    // check that file opened correctly
+    if (!file.is_open()) {
+        std::cerr << "Error: could not open airports.csv\n";
+        return 1;
     }
-    std::cout << "Complete " << std::endl;
 
-    // 2D vector of all of the origins/destinations of flights (again, quicker for me and quicker for the computer)
-    std::vector<std::vector<std::string>> TEST_flight_labels = {
-        {"ABE", "ABQ"},{"ABE", "ABY"},{"ABQ", "ACT"},{"ACT", "ABE"},{"ADS", "ABY"}};
+    std::string line;
 
-    // 2D vector of all of the costs/distances of flights
-    std::vector<std::vector<int>> TEST_flight_weights_distance_cost = {
-        {424, 374},{744, 106},{274, 225},{194, 123},{150,900}};
+    // vector of strings of airport names 
+    std::vector<std::string> airports;
 
-        std::cout << "Inserting Edges: ";
-        //  Create the edges
-        for (size_t i = 0; i < TEST_flight_labels.size(); i++)
-        TEST_Airport_Graph.insertEdge( TEST_flight_labels[i][0], TEST_flight_labels[i][1], TEST_flight_weights_distance_cost[i][0], TEST_flight_weights_distance_cost[i][1]);
-        std::cout << "Complete\n\n";
+    // flights represented by 2 2D vectors: one for labels and one for distance/cost 
+    std::vector<std::vector<std::string>> flight_labels;
+    std::vector<std::vector<int>> flight_weights_distance_cost;
 
-    //  =================================================================================================================================
+    // Use set only to avoid duplicate airport inserts
+    std::set<std::string> airport_set;
 
+    // Skip header
+    std::getline(file, line);
 
-    //  ---------------------------------------------------------------------------------------------------------------------------------  
-    //  COMMENTED OUT FOR TESTING PURPOSES EVERYTHING BETWEEN THE --- LINES IS INTEDNED FOR THE FINAL AFTER REVISION
-    
-    // // // Open csv file
-    // std::ifstream file("airports.csv");
+    // execute loop on each line to extract data
+    while (std::getline(file, line)) {
+        // Skip empty lines to prevent processing errors
+        if (line.empty() || line.find_first_not_of(" \t\n\r") == std::string::npos) {
+            continue;
+        }
 
-    // // check that file opened correctly
-    // if (!file.is_open()) {
-    //     std::cerr << "Error: could not open airports.csv\n";
-    //     return 1;
-    // }
-
-    // std::string line;
-
-    // // vector of strings of airport names 
-    // std::vector<std::string> airports;
-
-    // // flights represented by 2 2D vectors: one for labels and one for distance/cost 
-    // std::vector<std::vector<std::string>> flight_labels;
-    // std::vector<std::vector<int>> flight_weights_distance_cost;
-
-    // // Use set only to avoid duplicate airport inserts
-    // std::set<std::string> airport_set;
-
-    // // Skip header
-    // std::getline(file, line);
-
-    // // execute loop on each line to extract data
-    // while (std::getline(file, line)) {
-
-    //     // temp container, stores split fields from one row
-    //     std::vector<std::string> csv_fields;
+        std::vector<std::string> csv_fields;
+        std::string current_csv_field = "";
         
-    //     // temp string, builds current field character by character
-    //     std::string current_csv_field = "";
+        // NEW QUOTE-AWARE PARSING LOGIC
+        bool inQuotes = false;
+        for (int i = 0; i < (int)line.size(); i++) {
+            char current_char = line[i];
 
-    //     // split csv line into fields using comma separator
-    //     for (int i = 0; i < (int)line.size(); i++) {
-    //         char current_char = line[i];
+            // Ignore Windows carriage returns
+            if (current_char == '\r') continue;
 
-    //         if (current_char == ',') {
-    //             csv_fields.push_back(current_csv_field);
-    //             current_csv_field = "";
-    //         } 
-            
-    //         else {
-    //             current_csv_field += current_char;
-    //         }
-    //     }
-    //     // push back after processing 
-    //     csv_fields.push_back(current_csv_field);
+            // Toggle quote mode
+            if (current_char == '\"') {
+                inQuotes = !inQuotes;
+                continue; 
+            }
 
-    //     // extract values
-    //     std::string origin = csv_fields[0];
-    //     std::string dest   = csv_fields[1];
+            // Only split on comma if we are NOT inside a quoted city name
+            if (current_char == ',' && !inQuotes) {
+                csv_fields.push_back(current_csv_field);
+                current_csv_field = "";
+            } 
+            else {
+                current_csv_field += current_char;
+            }
+        }
+        csv_fields.push_back(current_csv_field);
 
-    //     int distance = std::stoi(csv_fields[4]);
-    //     int cost     = std::stoi(csv_fields[5]);
+        // Ensure the row has enough columns (Distance is index 4, Cost is index 5)
+        if (csv_fields.size() < 6) {
+            continue;
+        }
 
-    //     // collect unique airports for later insertion as graph nodes
-    //     if (airport_set.insert(origin).second) {
-    //         airports.push_back(origin); //"***" where each * is a letter?
-    //     }
-    //     if (airport_set.insert(dest).second)
-    //         airports.push_back(dest);
+        try {
+            std::string origin = csv_fields[0];
+            std::string dest   = csv_fields[1];
 
-    //     // collect distances and costs for later insertion of edges
-    //     flight_labels.push_back({origin, dest});
-    //     flight_weights_distance_cost.push_back({distance, cost});
-    // }
+            // std::stoi will now receive clean numbers
+            int distance = std::stoi(csv_fields[4]);
+            int cost     = std::stoi(csv_fields[5]);
 
-    // file.close();
+            // collect unique airports
+            if (airport_set.insert(origin).second) {
+                airports.push_back(origin); 
+            }
+            if (airport_set.insert(dest).second) {
+                airports.push_back(dest);
+            }
 
-    // // build vertices
-    // for (int i = 0; i < (int)airports.size(); i++) {
-    //     Airport_Graph.insertVertex(airports[i]);
-    // }
+            flight_labels.push_back({origin, dest});
+            flight_weights_distance_cost.push_back({distance, cost});
+        } 
+        catch (const std::exception& e) {
+            // Silently skip malformed rows
+            continue;
+        }
+    }
 
-    // // build edges (unchanged style)
-    // for (size_t i = 0; i < flight_labels.size(); i++) {
-    //     Airport_Graph.insertEdge(
-    //         flight_labels[i][0], // start node
-    //         flight_labels[i][1], // end node
-    //         flight_weights_distance_cost[i][0], // distance
-    //         flight_weights_distance_cost[i][1] // cost
-    //     );
-    // }
+    file.close();
 
-    //  MANDATORY INCLUDE IN FINAL
-    //  THE ABOVE IS COMMENTED OUT FOR TESTING PURPOSES
-    //  ---------------------------------------------------------------------------------------------------------------------------------  
+    // build vertices
+    for (int i = 0; i < (int)airports.size(); i++) {
+        Airport_Graph.insertVertex(airports[i]);
+    }
 
-    
-    //Testing Code Below Here:
-    
-    //  generic print to view the graph status
-
+    // build edges using the updated 4-parameter insertEdge
+    for (size_t i = 0; i < flight_labels.size(); i++) {
+        Airport_Graph.insertEdge(
+            flight_labels[i][0], 
+            flight_labels[i][1], 
+            flight_weights_distance_cost[i][0], 
+            flight_weights_distance_cost[i][1]
+        );
+    }
+    //----------------------------------------------------------------------------------------------------
     std::cout << "All Unique Airports: " << std::endl;
-    TEST_Airport_Graph.print();
-    
-    std::cout << std::endl;
+    Airport_Graph.print();
+    std::cout << "------------------------------------------" << std::endl;
 
-    //  Shortest Path
-    TEST_Airport_Graph.shortestPath("BNA", "ATL");
-    
-    std::cout << std::endl;
-    
-    //  Task 5 direct flight count
-    TEST_Airport_Graph.countDirectFlights();
-    
-    //std::cout << std::endl;
-    
-    //  Task 6 undirected graph
-    //TEST_Airport_Graph.undirectedGraph();
-    
-    //std::cout << std::endl;
+    // [Matthew TODO][DONE] Find shortest path by distance between origin airport and destination
+    // Must output path and total distance
+    Airport_Graph.shortestPath("BNA", "ATL");
+    std::cout << "------------------------------------------" << std::endl;
 
-    //  Task 8 spanning forest
-    //TEST_Airport_Graph.minimumSpanningForest();
+    // [Evan Done?] 5) count and display the direct flight connections for each airport
+    // This works exactly as expected for the Testing sample set. 
+    Airport_Graph.countDirectFlights();
+    std::cout << "------------------------------------------" << std::endl;
 
-
+    // [Matthew DONE] 8) Minimum spanning forest with Kruskals
+    // Generate a minimum spanning forest using Kruskal’s algorithm.
+    Airport_Graph.minimumSpanningForest();
+    std::cout << "------------------------------------------" << std::endl;
 
     return 0;
 }
