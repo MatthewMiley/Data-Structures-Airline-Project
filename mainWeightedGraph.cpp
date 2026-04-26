@@ -132,6 +132,10 @@ int main(void) {
     Airport_Graph.countDirectFlights();
     std::cout << "------------------------------------------" << std::endl;
 
+    // [Matthew DONE] 7) Minimum spanning tree with Prim's
+    Airport_Graph.minimumSpanningTree();
+    std::cout << "------------------------------------------" << std::endl;
+
     // [Matthew DONE] 8) Minimum spanning forest with Kruskals
     // Generate a minimum spanning forest using Kruskal’s algorithm.
     Airport_Graph.minimumSpanningForest();

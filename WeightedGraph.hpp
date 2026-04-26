@@ -44,7 +44,10 @@ public:
     //  [Evan TODO] 6) Undirected Graph
     void undirectedGraph() const;
     
-    //  [Evan TODO] 8)  Minimum spanning forest with Kruskals
+    //  [Matthew TODO] 7) Minimum spanning tree with Prim's
+    void minimumSpanningTree() const;
+
+    //  [Matthew Done] 8)  Minimum spanning forest with Kruskals
     void minimumSpanningForest() const;
 
     bool isConnected() const;
