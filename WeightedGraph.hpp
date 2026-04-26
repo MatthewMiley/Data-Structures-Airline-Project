@@ -42,7 +42,7 @@ public:
     void countDirectFlights() const;
 
     //  [Evan TODO] 6) Undirected Graph
-    void undirectedGraph() const;
+    WeightedGraph<T> undirectedGraph() const;
     
     //  [Evan TODO] 8)  Minimum spanning forest with Kruskals
     void minimumSpanningForest() const;

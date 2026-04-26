@@ -315,7 +315,7 @@ void WeightedGraph<T>::countDirectFlights() const {
 
 //  [Evan TODO] 6) Undirected Graph
 template <typename T>
-void WeightedGraph<T>::undirectedGraph() const {
+WeightedGraph<T> WeightedGraph<T>::undirectedGraph() const {
 
     /*
         Create an undirected graph from the original directed graph using the following rules:
@@ -328,11 +328,111 @@ void WeightedGraph<T>::undirectedGraph() const {
                 them, you keep the one with the minimum cost value as an undirected weighted edge.
                 You can ignore the distance on that edge
 
-            //  Keep the existing edge with the smallest cost [ignore distance] and add the other for undirected, or modify it to match the first
     
-            */
-    std::cout << "Evan will do this soon" << std::endl;
+    */
+
+    //  'edges' vector already has the directed edges, now just use the logic to create/modify it onto this new vector with the undirected property
+    std::vector<std::vector<Edge>> undirectedEdges;
+
+    //  Initialize the undirectedEdges with empty vectors
+    std::vector<Edge> tmp;
+    for (int i = 0; i < vertices.size(); i++) {
+        undirectedEdges.push_back(tmp);
+    }
+
+    //  vertex_idx is the index of the current vertex
+    for (int vertex_idx = 0; vertex_idx < vertices.size(); vertex_idx++) {
+
+        //  for each vertex: loop through the edges, and check for a match to compare to or add both
+
+        //  edge_idx is the index of the current edge for each vertex
+        for (int edge_idx = 0; edge_idx < edges[vertex_idx].size(); edge_idx++) {
+
+            //  first check if both exist
+
+            //  find_edge_idx is the index for the destination vertex
+            int find_edge_idx = edges[vertex_idx][edge_idx].destination_idx;
+            //  After interating, if no match found, then simply copy the reverse to the destination
+            bool found_match;
+            found_match = false;
+
+            //  loop through the destinations index to check for a match
+            for (int i = 0; i < edges[find_edge_idx].size(); i++) {
+                
+                if (!found_match) {
+                    if (edges[find_edge_idx][i].destination_idx == vertex_idx) {
+                        //  match between two edges
+                        found_match = true;
+
+                        //  check if they were already found
+                        bool already_found = false;
+                        for (int dupe_idx = 0; dupe_idx < undirectedEdges[vertex_idx].size(); dupe_idx++) {
+                            if (undirectedEdges[vertex_idx][dupe_idx].origin == edges[vertex_idx][edge_idx].origin && undirectedEdges[vertex_idx][dupe_idx].destination == edges[vertex_idx][edge_idx].destination) {
+                                already_found = true;
+                            }
+                        }
+
+
+                        if (!already_found) {
+                            
+                            //  now compare and make two copies of the lowest cost
+    
+                            //  set the cost and distance to the first edge
+                            int low_cost = edges[vertex_idx][edge_idx].cost;
+                            int low_distance = edges[vertex_idx][edge_idx].distance;
+    
+                            //  if the second edge has a smaller cost, then change, otherwise remain
+                            if (edges[find_edge_idx][i].cost < low_cost) {
+                                low_cost = edges[find_edge_idx][i].cost;
+                                low_distance = edges[find_edge_idx][i].distance;
+                            }
+    
+                            // now supply both edges with the same lowest cost distance pair
+    
+                            //  add origin edge into undirected edges
+                            undirectedEdges[vertex_idx].push_back(Edge(vertices[vertex_idx], vertex_idx, vertices[find_edge_idx], find_edge_idx, low_distance, low_cost));
+                            //  add destination edge into undirected edges
+                            undirectedEdges[find_edge_idx].push_back(Edge(vertices[find_edge_idx], find_edge_idx, vertices[vertex_idx], vertex_idx, low_distance, low_cost));
+                            
+                        }
+                    }
+                }
+                
+            }
+            if (!found_match) {
+                
+                //  add origin edge into undirected edges
+                undirectedEdges[vertex_idx].push_back(Edge(vertices[vertex_idx], vertex_idx, vertices[find_edge_idx], find_edge_idx, edges[vertex_idx][edge_idx].distance, edges[vertex_idx][edge_idx].cost));
+                //  add destination edge into undirected edges
+                undirectedEdges[find_edge_idx].push_back(Edge(vertices[find_edge_idx], find_edge_idx, vertices[vertex_idx], vertex_idx, edges[vertex_idx][edge_idx].distance, edges[vertex_idx][edge_idx].cost));
+
+            }
+
+        }
+        
+    }
+
+    //  It is unclear, whether I need to actually display the undirected graph or just create and return it. will inquire and match accordingly
+    
+    //  Display
+    std::cout << "\nUndirected Graph: \n"; 
+    for (const auto& vect : undirectedEdges) {
+        for (const auto& edg : vect) {
+            std::cout << edg.origin << " -> " << edg.destination << " = " << edg.cost << std::endl;
+        }
+        std::cout << std::endl;
+    }
+
+    WeightedGraph<std::string> undir;
+    undir.vertices = vertices;
+    undir.edges = edges;
+
+    return undir;
+
+
+
 }
+
 
 //  [Matthew TODO] 8)  Minimum spanning forest with Kruskals
 template <typename T>

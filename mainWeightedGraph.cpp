@@ -127,9 +127,12 @@ int main(void) {
     Airport_Graph.shortestPath("BNA", "ATL");
     std::cout << "------------------------------------------" << std::endl;
 
-    // [Evan Done?] 5) count and display the direct flight connections for each airport
-    // This works exactly as expected for the Testing sample set. 
+    // [Evan DONE] 5) count and display the direct flight connections for each airport
     Airport_Graph.countDirectFlights();
+    std::cout << "------------------------------------------" << std::endl;
+    
+    // [Evan TODO] 6) creat a undirected graph from the original using minimum cost routes
+    WeightedGraph<std::string> undirectedAirportGraph = Airport_Graph.undirectedGraph();
     std::cout << "------------------------------------------" << std::endl;
 
     // [Matthew DONE] 8) Minimum spanning forest with Kruskals
