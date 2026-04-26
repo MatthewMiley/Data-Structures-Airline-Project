@@ -24,9 +24,20 @@ void WeightedGraph<T>::insertVertex(const T& vertex_value) {
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
+//Helper function for shortestPathToState
+template <typename T>
+std::string WeightedGraph<T>::getStateAbbreviation(std::string city_state_string) const {
+    if (city_state_string.length() < 2) {
+        return "";
+    }
+    return city_state_string.substr(city_state_string.length() - 2);
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
 //Weight=distance
 template <typename T>
-void WeightedGraph<T>::insertEdge(const T& vertex_1, const T& vertex_2, int weight, int price) {
+void WeightedGraph<T>::insertEdge(const T& vertex_1, const T& vertex_2, int weight, int price, std::string origin_city, std::string dest_city) {
     // Get the internal index for the source vertex
     int index_1 = getVertexIndex(vertex_1);
     // Get the internal index for the destination vertex
@@ -41,7 +52,7 @@ void WeightedGraph<T>::insertEdge(const T& vertex_1, const T& vertex_2, int weig
     // If the edge doesn't already exist between these two indices
     if (!hasEdge(index_1, index_2))  {
         // Add a new Edge object to the source vertex's adjacency list
-        edges[index_1].push_back(Edge(vertex_1, index_1, vertex_2, index_2, weight, price));
+        edges[index_1].push_back(Edge(vertex_1, index_1, origin_city, vertex_2, index_2, dest_city, weight, price));
     }
 }
 
@@ -203,6 +214,130 @@ void WeightedGraph<T>::shortestPath(const T& source, const T& destination) const
     std::cout << ". The length is " << distances[index_destination] << ". The cost is " << price[index_destination] << "." << std::endl;
 
     return; // No path exists
+}
+
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+//[Matthew Done] 3) Find the shortest by distance paths between a given origin airport to each airport located in a given
+//destination state. The algorithm must output each path and its corresponding length. If no such
+//paths exist, the program must display an appropriate message.
+
+template <typename T>
+void WeightedGraph<T>::shortestPathToState(const T& source, std::string target_state) const {
+    // Find vertex indices from the airport abbreviations
+    int index_source = getVertexIndex(source);
+
+    //-------------------------------------------------------------------------------------
+
+    // Check edge cases
+
+    //if origin airport doesn't exist in the vector of unique airports (the vertex index is -1) print an error
+    if (index_source == -1) {
+        std::cout << "Shortest route from " << source << " to " << target_state << ": None" << std::endl;
+        return;
+    }
+
+    //--------------------------------------------------------------------------------------
+
+    //CREATING VECTORS TO TRACK NAMES, PRICE, AND DISTANCE
+
+    // Create distances vector
+    std::vector<int> distances(vertices.size()); // distances from source to all other nodes
+    // Set initial distances
+    for (int i = 0; i < distances.size(); i++) {
+        // Using a large number INT_MAX to represent infinity so -1 doesn't break comparisons
+        distances[i] = (i == index_source) ? 0 : INT_MAX;
+    }
+
+    //create a predecessor vector that keeps track of which airports you've visited in the attempt of finding the shortest path.
+    std::vector<int> predecessor(vertices.size(), -1);
+
+    //create a price vector to update the price with each new path update
+    std::vector<int> price(vertices.size(), 0);
+
+    //---------------------------------------------------------------------------------------
+    // Perform BFS and update distances
+
+
+    // Use a vector as a queue for manual processing
+    std::vector<int> processing_queue;
+    // Start with the source index in the queue
+    processing_queue.push_back(index_source);
+
+    // Continue as long as there are airports left to explore
+    while (!processing_queue.empty()) {
+        //Find the index in 'processing_queue' that has the smallest value in distances
+        int smallest_index_in_queue = 0;
+        for (int i = 1; i < processing_queue.size(); i++) {
+            if (distances[processing_queue[i]] < distances[processing_queue[smallest_index_in_queue]]) {
+                smallest_index_in_queue = i;
+            }
+        }
+        //Get the actual airport index and remove it from the queue
+        int current_vertex = processing_queue[smallest_index_in_queue];
+        processing_queue.erase(processing_queue.begin() + smallest_index_in_queue);
+
+        // Check the neighbors of current node
+        for (const auto& edge : edges[current_vertex]) {
+            // Get the destination index of the current edge
+            int neighbor_index = edge.destination_idx; 
+            // Calculate the total distance from source to this neighbor
+            int new_distance = distances[current_vertex] + edge.distance;
+
+            // If we found a shorter path to this neighbor
+            if (new_distance < distances[neighbor_index]) { 
+                // Update the shortest distance to this neighbor
+                distances[neighbor_index] = new_distance;
+                // Update the running price total for this path
+                price[neighbor_index] = price[current_vertex] + edge.cost;
+                // Track where we came from to reconstruct the path later
+                predecessor[neighbor_index] = current_vertex;
+                // Add the neighbor to the queue to explore its neighbors
+                processing_queue.push_back(neighbor_index);
+            }
+        }
+    }
+
+    // --- FILTER BY STATE AND OUTPUT ---
+    std::cout << "Shortest paths from " << source << " to airports in " << target_state << ":" << std::endl;
+    bool found = false;
+
+    for (int i = 0; i < vertices.size(); i++) {
+        // Find the city name for the current vertex to check the state
+        std::string city_name = "";
+        for (const auto& list : edges) {
+            for (const auto& e : list) {
+                if (e.destination_idx == i) { city_name = e.dest_city; break; }
+            }
+            if (city_name != "") break;
+        }
+
+        // Check if this vertex belongs to the target state and is reachable
+        if (getStateAbbreviation(city_name) == target_state && distances[i] < 1000000) {
+            found = true;
+
+            // Path Reconstruction
+            // Create a vector to store the path in reverse order
+            std::vector<T> reconstructed_path;
+            // Walk backwards from destination to source using the predecessor links
+            for (int current_step = i; current_step != -1; current_step = predecessor[current_step]) {
+                reconstructed_path.push_back(vertices[current_step]);
+            }
+
+            // Output formatted result
+            // Loop backwards through the path vector to print from source to destination
+            for (int j = reconstructed_path.size() - 1; j >= 0; j--) {
+                // Print the airport and an arrow if it's not the last one
+                std::cout << reconstructed_path[j] << (j == 0 ? "" : " -> ");
+            }
+            // Print the final stats for distance and price
+            std::cout << ". The length is " << distances[i] << ". The cost is " << price[i] << "." << std::endl;
+        }
+    }
+
+    if (!found) {
+        std::cout << "No paths found to " << target_state << "." << std::endl;
+    }
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------

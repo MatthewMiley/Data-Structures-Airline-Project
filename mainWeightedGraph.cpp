@@ -79,12 +79,14 @@ int main(void) {
         try {
             std::string origin = csv_fields[0];
             std::string dest   = csv_fields[1];
+            
+            // NEW: Extract the city/state strings from the CSV fields
+            std::string origin_city = csv_fields[2]; // e.g., "Allentown, PA"
+            std::string dest_city   = csv_fields[3]; // e.g., "Detroit, MI"
 
-            // std::stoi will now receive clean numbers
             int distance = std::stoi(csv_fields[4]);
             int cost     = std::stoi(csv_fields[5]);
 
-            // collect unique airports
             if (airport_set.insert(origin).second) {
                 airports.push_back(origin); 
             }
@@ -92,9 +94,10 @@ int main(void) {
                 airports.push_back(dest);
             }
 
-            flight_labels.push_back({origin, dest});
+            // UPDATE: Store all 4 strings now: code, dest, origin_city, dest_city
+            flight_labels.push_back({origin, dest, origin_city, dest_city});
             flight_weights_distance_cost.push_back({distance, cost});
-        } 
+        }
         catch (const std::exception& e) {
             // Silently skip malformed rows
             continue;
@@ -111,10 +114,12 @@ int main(void) {
     // build edges using the updated 4-parameter insertEdge
     for (size_t i = 0; i < flight_labels.size(); i++) {
         Airport_Graph.insertEdge(
-            flight_labels[i][0], 
-            flight_labels[i][1], 
-            flight_weights_distance_cost[i][0], 
-            flight_weights_distance_cost[i][1]
+            flight_labels[i][0], // origin code
+            flight_labels[i][1], // dest code
+            flight_weights_distance_cost[i][0], // distance
+            flight_weights_distance_cost[i][1], // cost
+            flight_labels[i][2], // origin city/state string
+            flight_labels[i][3]  // dest city/state string
         );
     }
     //----------------------------------------------------------------------------------------------------
@@ -127,13 +132,18 @@ int main(void) {
     Airport_Graph.shortestPath("BNA", "ATL");
     std::cout << "------------------------------------------" << std::endl;
 
+    // [Matthew TODO][DONE] Find shortest path by distance between origin airport and destination
+    // 
+    Airport_Graph.shortestPathToState("ATL", "FL");
+    std::cout << "------------------------------------------" << std::endl;
+
     // [Evan DONE] 5) count and display the direct flight connections for each airport
     Airport_Graph.countDirectFlights();
     std::cout << "------------------------------------------" << std::endl;
     
     // [Evan TODO] 6) creat a undirected graph from the original using minimum cost routes
-    WeightedGraph<std::string> undirectedAirportGraph = Airport_Graph.undirectedGraph();
-    std::cout << "------------------------------------------" << std::endl;
+    // WeightedGraph<std::string> undirectedAirportGraph = Airport_Graph.undirectedGraph();
+    // std::cout << "------------------------------------------" << std::endl;
 
     // [Matthew DONE] 7) Minimum spanning tree with Prim's
     Airport_Graph.minimumSpanningTree();
