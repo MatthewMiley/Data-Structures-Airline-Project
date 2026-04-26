@@ -76,7 +76,7 @@ void HashMap<K, V>::insert(const K& key) {
 
 template <typename K, typename V>
 void HashMap<K, V>::incrementValue(const K& key, const int& val) {
-    data[hash(key)]->value += val;
+    data[searchIndex(key)]->value += val;
 }
 
 template <typename K, typename V>
@@ -85,7 +85,7 @@ int HashMap<K, V>::searchIndex(const K& key) const {
     int index = hash(key);
 
     while (data[index] && data[index] != deleted) {
-        if (data[index].key == key) {
+        if (data[index]->key == key) {
             return index;
         }
         index = (index + 1) % data.size(); // Go to the next position

@@ -270,6 +270,8 @@ void WeightedGraph<T>::shortestPath(const T& src, const T& dest) const {
 template <typename T>
 void WeightedGraph<T>::countDirectFlights() const {
 
+    std::cout << "Total Number of Direct Flights: " << std::endl;
+
     // 'verticies' has a list of every unique airport vertex
     //  using a hashmap I can count the amount of times each origin has an outgoing
     //  flight as well as every time a flight has one incomming.
@@ -312,5 +314,41 @@ void WeightedGraph<T>::countDirectFlights() const {
         ORD     11
         MIA     11
     */
+
+}
+
+//  [Evan TODO] 6) Undirected Graph
+template <typename T>
+void WeightedGraph<T>::undirectedGraph() const {
+
+    /*
+        Create an undirected graph from the original directed graph using the following rules:
+    
+            a. For each pair of vertices u and v, if there is only one directed edge(either (u,v) or (v,u))
+                between them, you keep that single edge with its corresponding cost as an undirected
+                weighted edge. You can ignore the distance on that edge.
+    
+            b. For each pair of vertices u and v, if there are two directed edges (u,v) and (v, u) between
+                them, you keep the one with the minimum cost value as an undirected weighted edge.
+                You can ignore the distance on that edge
+
+            //  Keep the existing edge with the smallest cost [ignore distance] and add the other for undirected, or modify it to match the first
+    
+            */
+    std::cout << "Evan will do this soon" << std::endl;
+}
+
+//  [Evan TODO] 8)  Minimum spanning forest with Kruskals
+template <typename T>
+void WeightedGraph<T>::minimumSpanningForest() const {
+
+    /*
+        Generate a minimum spanning forest using Kruskal’s algorithm. The algorithm must output the
+        edges included in the forest and its total cost. In this step, cost must be used as the edge weight. If
+        the graph is disconnected, the program must output a minimum spanning forest consisting of
+        one minimum spanning tree for each connected component. 
+    
+    */
+    std::cout << "Evan will do this soon" << std::endl;
 
 }

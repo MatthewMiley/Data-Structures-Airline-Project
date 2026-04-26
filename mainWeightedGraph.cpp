@@ -15,24 +15,27 @@ int main(void) {
     //  EVERYTHING BETWEEN THE TWO === LINES IS FOR TESTING PURPOSES ONLY DO NOT INCLUDE IN FINAL
 
     // A vector of limited airports for quick testing as recommended by Igor
-    std::vector<std::string> TEST_airports = {"ABE","ABQ","ABY","ACT"};
+    std::vector<std::string> TEST_airports = {"ABE","ABQ","ABY","ACT","ADS","ZYX"};
     // create a node for every unique airport using the vector
+    std::cout << "Inserting Airports: ";
     for (int i = 0; i < (int)TEST_airports.size(); i++ ) {
         TEST_Airport_Graph.insertVertex(TEST_airports[i]);
     }
+    std::cout << "Complete " << std::endl;
 
     // 2D vector of all of the origins/destinations of flights (again, quicker for me and quicker for the computer)
     std::vector<std::vector<std::string>> TEST_flight_labels = {
-        {"ABE", "ABQ"},{"ABE", "ABY"},{"ABQ", "ACT"},{"ACT", "ABE"}};
+        {"ABE", "ABQ"},{"ABE", "ABY"},{"ABQ", "ACT"},{"ACT", "ABE"},{"ADS", "ABY"}};
 
     // 2D vector of all of the costs/distances of flights
     std::vector<std::vector<int>> TEST_flight_weights_distance_cost = {
-        {424, 374},{744, 106},{274, 225},{194, 123}};
+        {424, 374},{744, 106},{274, 225},{194, 123},{150,900}};
 
-
+        std::cout << "Inserting Edges: ";
         //  Create the edges
         for (size_t i = 0; i < TEST_flight_labels.size(); i++)
         TEST_Airport_Graph.insertEdge( TEST_flight_labels[i][0], TEST_flight_labels[i][1], TEST_flight_weights_distance_cost[i][0], TEST_flight_weights_distance_cost[i][1]);
+        std::cout << "Complete\n\n";
 
     //  =================================================================================================================================
 
@@ -133,6 +136,8 @@ int main(void) {
     //Testing Code Below Here:
     
     //  generic print to view the graph status
+
+    std::cout << "All Unique Airports: " << std::endl;
     TEST_Airport_Graph.print();
     
     std::cout << std::endl;
@@ -141,9 +146,21 @@ int main(void) {
     TEST_Airport_Graph.shortestPath("BNA", "ATL");
     
     std::cout << std::endl;
-
+    
     //  Task 5 direct flight count
     TEST_Airport_Graph.countDirectFlights();
+    
+    //std::cout << std::endl;
+    
+    //  Task 6 undirected graph
+    //TEST_Airport_Graph.undirectedGraph();
+    
+    //std::cout << std::endl;
+
+    //  Task 8 spanning forest
+    //TEST_Airport_Graph.minimumSpanningForest();
+
+
 
     return 0;
 }
