@@ -42,7 +42,7 @@ public:
     void countDirectFlights() const;
 
     //  [Evan TODO] 6) Undirected Graph
-    void undirectedGraph() const;
+    WeightedGraph<T> undirectedGraph() const;
     
     //  [Matthew TODO] 7) Minimum spanning tree with Prim's
     void minimumSpanningTree() const;
