@@ -137,13 +137,17 @@ int main(void) {
     Airport_Graph.shortestPathToState("ATL", "FL");
     std::cout << "------------------------------------------" << std::endl;
 
-    // [Evan DONE] 5) count and display the direct flight connections for each airport
+    //  [Evan DONE] 4) find shortest path by distance with an exact stop count
+    Airport_Graph.shortestDistanceByStopNumber("BNA", "ATL", 2);
+    std::cout << "------------------------------------------" << std::endl;
+
+    //  [Evan DONE] 5) count and display the direct flight connections for each airport
     Airport_Graph.countDirectFlights();
     std::cout << "------------------------------------------" << std::endl;
     
-    // [Evan TODO] 6) creat a undirected graph from the original using minimum cost routes
-    // WeightedGraph<std::string> undirectedAirportGraph = Airport_Graph.undirectedGraph();
-    // std::cout << "------------------------------------------" << std::endl;
+    //  [Evan DONE] 6) creat a undirected graph from the original using minimum cost routes
+    WeightedGraph<std::string> undirectedAirportGraph = Airport_Graph.undirectedGraph();
+    //std::cout << "------------------------------------------" << std::endl;
 
     // [Matthew DONE] 7) Minimum spanning tree with Prim's
     Airport_Graph.minimumSpanningTree();

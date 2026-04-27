@@ -39,11 +39,14 @@ public:
     //  [Matthew Done] 3) shortest path from an origin airport to a state destination
     void shortestPathToState(const T& source, std::string target_state) const;
 
-    //  [Evan Done] 5) count and display the direct flight connections for each airport
+    //  [Evan DONE] 4) find shortest path by distance with an exact stop count
+    void shortestDistanceByStopNumber(const T origin, const T& final_destination, const int stops_remaining) const;
+
+    //  [Evan DONE] 5) count and display the direct flight connections for each airport
     void countDirectFlights() const;
 
-    //  [Evan TODO] 6) Undirected Graph
-    void undirectedGraph() const;
+    //  [Evan DONE] 6) Undirected Graph
+    WeightedGraph<T> undirectedGraph() const;
     
     //  [Matthew TODO] 7) Minimum spanning tree with Prim's
     void minimumSpanningTree() const;
@@ -65,6 +68,9 @@ private:
 
     //helper function to grab the state abriviation 
     std::string getStateAbbreviation(std::string city_state_string) const;
+
+    //  4) recursive part after the helper function
+    void shortestDistanceByStopNumber(const T current, const T& final_destination, const int stops_remaining, std::string stops_route, const int stops_distance, const int stops_cost, std::string& shortest_path, int& shortest_distance, int& shortest_cost) const;
 
     bool hasEdge(int i1, int i2) const;
 };

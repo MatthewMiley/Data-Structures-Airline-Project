@@ -342,8 +342,73 @@ void WeightedGraph<T>::shortestPathToState(const T& source, std::string target_s
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-//  [Evan Done?] 5) count and display the direct flight connections for each airport
-//  This works exactly as expected for the Testing sample set. will check again after csv data is functioning
+//  [Evan DONE] #4 Shortest distance between two locations given a specific number of stops between them
+template <typename T>
+void WeightedGraph<T>::shortestDistanceByStopNumber(const T origin, const T& final_destination, const int stops_remaining) const {
+    
+    int fin_distance = -1;
+    int fin_cost = -1;
+    std::string tmp_route = "";
+    tmp_route = tmp_route;
+    std::string fin_path = tmp_route;
+
+    shortestDistanceByStopNumber(origin, final_destination, stops_remaining + 1, tmp_route, 0, 0, fin_path, fin_distance, fin_cost);
+
+    std::cout << "Shortest route from " << origin << " to " << final_destination << " with " << stops_remaining << " stops: ";
+    if (fin_distance == -1) {
+        std::cout << "None\n"; 
+    }
+    else
+    {
+        std::cout << fin_path << "\nThe Length is : " << fin_distance << "\nCost of : " << fin_cost << std::endl;
+    }
+
+
+
+}
+
+//  [Evan DONE] #4 Helper
+template <typename T>
+void WeightedGraph<T>::shortestDistanceByStopNumber(const T current, const T& final_destination, const int stops_remaining, std::string stops_route, const int stops_distance, const int stops_cost, std::string& shortest_path, int& shortest_distance, int& shortest_cost) const {
+    
+    //  never continue after stops are diminished
+    if (stops_remaining == 0) {
+
+        //  is this the destination
+        if (current == final_destination) {
+            
+            //  is this either the first or the shortest
+            if (shortest_distance > stops_distance | shortest_distance == -1) {
+                //  update shortest
+                stops_route = stops_route + current;
+    
+                shortest_path = stops_route;
+                shortest_distance = stops_distance;
+                shortest_cost = stops_cost;
+        
+            }
+        }
+        return;
+
+
+    }
+    else if (current == final_destination) {
+        //  if this is the final, but not the right stops return
+        return;
+    }
+
+
+    //  DFS search through to find all paths with stop count
+    for (int i = 0; i < edges[getVertexIndex(current)].size(); i++) {
+        shortestDistanceByStopNumber(edges[getVertexIndex(current)][i].destination, final_destination, stops_remaining - 1, stops_route + current + "->" , stops_distance + edges[getVertexIndex(current)][i].distance, stops_cost + edges[getVertexIndex(current)][i].cost, shortest_path, shortest_distance, shortest_cost);
+    }
+
+
+
+}
+
+
+//  [Evan Done] 5) count and display the direct flight connections for each airport
 template <typename T>
 void WeightedGraph<T>::countDirectFlights() const {
 
@@ -382,25 +447,12 @@ void WeightedGraph<T>::countDirectFlights() const {
     // Print out the final tallies from the hashmap
     airport_map.mapOutput();
 }
+
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-//  [Evan TODO] 6) Undirected Graph
+//  [Evan DONE] 6) Undirected Graph
 template <typename T>
-void WeightedGraph<T>::undirectedGraph() const {
-
-    /*
-        Create an undirected graph from the original directed graph using the following rules:
-    
-            a. For each pair of vertices u and v, if there is only one directed edge(either (u,v) or (v,u))
-                between them, you keep that single edge with its corresponding cost as an undirected
-                weighted edge. You can ignore the distance on that edge.
-    
-            b. For each pair of vertices u and v, if there are two directed edges (u,v) and (v, u) between
-                them, you keep the one with the minimum cost value as an undirected weighted edge.
-                You can ignore the distance on that edge
-
-    
-    */
+WeightedGraph<T> WeightedGraph<T>::undirectedGraph() const {
 
     //  'edges' vector already has the directed edges, now just use the logic to create/modify it onto this new vector with the undirected property
     std::vector<std::vector<Edge>> undirectedEdges;
@@ -459,11 +511,12 @@ void WeightedGraph<T>::undirectedGraph() const {
                             }
     
                             // now supply both edges with the same lowest cost distance pair
-    
+
                             //  add origin edge into undirected edges
-                            undirectedEdges[vertex_idx].push_back(Edge(vertices[vertex_idx], vertex_idx, vertices[find_edge_idx], find_edge_idx, low_distance, low_cost));
+
+                            undirectedEdges[vertex_idx].push_back(Edge(vertices[vertex_idx], vertex_idx, edges[vertex_idx][edge_idx].origin_city, vertices[find_edge_idx], find_edge_idx, edges[vertex_idx][edge_idx].dest_city, low_distance, low_cost));
                             //  add destination edge into undirected edges
-                            undirectedEdges[find_edge_idx].push_back(Edge(vertices[find_edge_idx], find_edge_idx, vertices[vertex_idx], vertex_idx, low_distance, low_cost));
+                            undirectedEdges[find_edge_idx].push_back(Edge(vertices[find_edge_idx], find_edge_idx, edges[vertex_idx][edge_idx].dest_city, vertices[vertex_idx], vertex_idx, edges[vertex_idx][edge_idx].origin_city, low_distance, low_cost));
                             
                         }
                     }
@@ -473,9 +526,9 @@ void WeightedGraph<T>::undirectedGraph() const {
             if (!found_match) {
                 
                 //  add origin edge into undirected edges
-                undirectedEdges[vertex_idx].push_back(Edge(vertices[vertex_idx], vertex_idx, vertices[find_edge_idx], find_edge_idx, edges[vertex_idx][edge_idx].distance, edges[vertex_idx][edge_idx].cost));
+                undirectedEdges[vertex_idx].push_back(Edge(vertices[vertex_idx], vertex_idx, edges[vertex_idx][edge_idx].origin_city, vertices[find_edge_idx], find_edge_idx, edges[vertex_idx][edge_idx].dest_city, edges[vertex_idx][edge_idx].distance, edges[vertex_idx][edge_idx].cost));
                 //  add destination edge into undirected edges
-                undirectedEdges[find_edge_idx].push_back(Edge(vertices[find_edge_idx], find_edge_idx, vertices[vertex_idx], vertex_idx, edges[vertex_idx][edge_idx].distance, edges[vertex_idx][edge_idx].cost));
+                undirectedEdges[find_edge_idx].push_back(Edge(vertices[find_edge_idx], find_edge_idx, edges[vertex_idx][edge_idx].dest_city, vertices[vertex_idx], vertex_idx, edges[vertex_idx][edge_idx].origin_city, edges[vertex_idx][edge_idx].distance, edges[vertex_idx][edge_idx].cost));
 
             }
 
@@ -483,26 +536,15 @@ void WeightedGraph<T>::undirectedGraph() const {
         
     }
 
-    //  It is unclear, whether I need to actually display the undirected graph or just create and return it. will inquire and match accordingly
-    
-    //  Display
-    std::cout << "\nUndirected Graph: \n"; 
-    for (const auto& vect : undirectedEdges) {
-        for (const auto& edg : vect) {
-            std::cout << edg.origin << " -> " << edg.destination << " = " << edg.cost << std::endl;
-        }
-        std::cout << std::endl;
-    }
 
     WeightedGraph<std::string> undir;
     undir.vertices = vertices;
     undir.edges = edges;
 
-    return ; //Change return type when needed
-
-
+    return undir;
 
 }
+
 
 
 //------------------------------------------------------------------------------------------------------------------------------------------
