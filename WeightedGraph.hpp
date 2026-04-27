@@ -33,12 +33,8 @@ public:
     //  (remove / alter) no need to simply print. Special prints will likely be handled by each of the search functions
     void print() const;
 
-    //  ================================================
-    //  Will not need the simple searches, will be replaced with the specialized searches
-    void DFS() const;
-    void BFS(int start = 0) const;
+    //[Matthew Done] 2) Shortest Path
     void shortestPath(const T& src, const T& dest) const;
-    //  ================================================
 
     //  [Matthew Done] 3) shortest path from an origin airport to a state destination
     void shortestPathToState(const T& source, std::string target_state) const;
@@ -55,7 +51,7 @@ public:
     //  [Matthew Done] 8)  Minimum spanning forest with Kruskals
     void minimumSpanningForest() const;
 
-    bool isConnected() const;
+    
 
 
 private:
@@ -71,7 +67,6 @@ private:
     std::string getStateAbbreviation(std::string city_state_string) const;
 
     bool hasEdge(int i1, int i2) const;
-    void DFS(int i, std::vector<bool>& visited) const;
 };
 
 #include "WeightedGraph.tpp"
